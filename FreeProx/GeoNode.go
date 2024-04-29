@@ -1,4 +1,4 @@
-package Providers
+package FreeProx
 
 import (
 	"encoding/json"
@@ -53,13 +53,34 @@ type AllServer struct {
 	CreatedAt time.Time
 }
 
-func (a AllServer) Len() int { return len(a.Servers) }
+func (a *AllServer) Len() int { return len(a.Servers) }
+
+func (a *AllServer) OrderByAnonLevel(top string) {
+
+}
+
+func (a *AllServer) FilterByAnonLevel(anonLevel string) {
+
+}
+
+func (a *AllServer) OrderByLatency(decending bool) {
+
+}
+
+func (a *AllServer) FilterByLatency(keepUntil float64) {
+
+}
+
+func (a *AllServer) OrderByUpdateDate(decending bool) {
+
+}
+
+func (a *AllServer) OrderByUptime(keepUntil float64) {}
 
 func GetAllProxies() AllServer {
 	client := &http.Client{}
 
 	initialRequestData := makeRequest(1, client)
-	// this calculation is wrong.
 	numberOfRemainingPages := int(math.Abs(float64(initialRequestData.Total / 500)))
 
 	a := AllServer{
@@ -83,28 +104,23 @@ func makeRequest(page int, client *http.Client) ResponseData {
 
 	req, err := http.NewRequest(method, geoNodeUrl, nil)
 	if err != nil {
-		print(1)
 		log.Fatal(err)
 	}
 	res, clientErr := client.Do(req)
 	if clientErr != nil {
-		print(2)
 		log.Fatal(clientErr)
 	}
 	defer res.Body.Close()
 
 	body, ioErr := io.ReadAll(res.Body)
 	if ioErr != nil {
-		print(3)
 		log.Fatal(ioErr)
 	}
 	var r ResponseData
 
 	jsonErr := json.Unmarshal([]byte(string(body)), &r)
 	if jsonErr != nil {
-		fmt.Println(4)
 		fmt.Println(geoNodeUrl)
-
 		if e, ok := err.(*json.SyntaxError); ok {
 			log.Printf("syntax error at byte offset %d", e.Offset)
 		}
